@@ -1,24 +1,38 @@
 package de.tu_bs.cs.rose.kedh;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.BasicConfigurator;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Hello world!
- *
- */
-public class App {
+public abstract class App {
 
 	private static final Logger logger = LoggerFactory.getLogger(App.class);
 
-	public static void main(final String[] args) {
+	private static SolrInputDocument buildDocument(final Map<String, String> fields) {
+		final SolrInputDocument document = new SolrInputDocument();
+		fields.forEach((k, v) -> document.addField(k, v));
+		return document;
+	}
+
+	public static void main(final String[] args) throws SolrServerException, IOException {
 		BasicConfigurator.configure();
 		logger.info("Hello World");
 
 		final String url = "http://localhost:8983/solr/kedh";
 
 		final SolrConnector solr = new SolrConnector(url);
-		solr.index();
+
+		final Map<String, String> fields = new HashMap<>();
+		fields.put("id", "42");
+		fields.put("name", "Jewgeni Rose");
+		final SolrInputDocument doc = buildDocument(fields);
+
+		solr.index(doc);
 	}
 }

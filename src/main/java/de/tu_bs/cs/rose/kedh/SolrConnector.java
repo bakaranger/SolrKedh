@@ -1,7 +1,11 @@
 package de.tu_bs.cs.rose.kedh;
 
+import java.io.IOException;
+
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrInputDocument;
 
 public class SolrConnector {
 
@@ -13,7 +17,16 @@ public class SolrConnector {
 		this.client = new HttpSolrClient.Builder(url).build();
 	}
 
-	public void index() {
+	public String getURL() {
+		return url;
+	}
 
+	public SolrClient getClient() {
+		return client;
+	}
+
+	public void index(final SolrInputDocument document) throws SolrServerException, IOException {
+		client.add(document);
+		client.commit();
 	}
 }
