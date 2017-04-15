@@ -12,27 +12,27 @@ import org.slf4j.LoggerFactory;
 
 public abstract class App {
 
-	private static final Logger logger = LoggerFactory.getLogger(App.class);
+  private static final Logger logger = LoggerFactory.getLogger(App.class);
 
-	private static SolrInputDocument buildDocument(final Map<String, String> fields) {
-		final SolrInputDocument document = new SolrInputDocument();
-		fields.forEach((k, v) -> document.addField(k, v));
-		return document;
-	}
+  private static SolrInputDocument buildDocument(final Map<String, String> fields) {
+    final SolrInputDocument doc = new SolrInputDocument();
+    fields.forEach((name, value) -> doc.addField(name, value));
+    return doc;
+  }
 
-	public static void main(final String[] args) throws SolrServerException, IOException {
-		BasicConfigurator.configure();
-		logger.info("Hello World");
+  public static void main(final String[] args) throws SolrServerException, IOException {
+    BasicConfigurator.configure();
+    logger.info("Hello World");
 
-		final String url = "http://localhost:8983/solr/kedh";
+    final String url = "http://localhost:8983/solr/kedh";
 
-		final SolrConnector solr = new SolrConnector(url);
+    final SolrConnector solr = new SolrConnector(url);
 
-		final Map<String, String> fields = new HashMap<>();
-		fields.put("id", "42");
-		fields.put("name", "Jewgeni Rose");
-		final SolrInputDocument doc = buildDocument(fields);
+    final Map<String, String> fields = new HashMap<>();
+    fields.put("id", "42");
+    fields.put("name", "Jewgeni Rose");
+    final SolrInputDocument doc = buildDocument(fields);
 
-		solr.index(doc);
-	}
+    solr.index(doc);
+  }
 }
