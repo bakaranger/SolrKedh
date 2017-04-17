@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<schema name="kedh" version="1.1">
+	<types>
+	  <fieldType name="name" class="solr.TextField" positionIncrementGap="100">
+	    <analyzer type="index">
+	      <tokenizer class="solr.StandardTokenizerFactory"/>
+	      <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+	      <!--in this example, we will only use synonyms at query time>
+	      <filter class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/-->	     
+	      <filter class="solr.LowerCaseFilterFactory"/>
+	    </analyzer>
+	    <analyzer type="query">
+	      <tokenizer class="solr.StandardTokenizerFactory"/>
+	      <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+	      <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+	      <filter class="solr.LowerCaseFilterFactory"/>
+	    </analyzer>
+	  </fieldType>
+	</types>
+
+	<fields>
+	  <field name="id" type="string" indexed="true" stored="true" required="true" />
+	  <field name="name" type="string" indexed="true" stored="true"/>
+	</fields>
+</schema>
