@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
 
 import java.io.IOException;
+import java.util.Collection;
 
 public class SolrConnector {
     
@@ -25,8 +26,21 @@ public class SolrConnector {
         return client;
     }
     
-    public void index(final SolrInputDocument document) throws SolrServerException, IOException {
-        client.add(document);
-        client.commit();
+    public void index(final SolrInputDocument document) {
+        try {
+            client.add(document);
+            client.commit();
+        } catch (final SolrServerException | IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public void index(final Collection<SolrInputDocument> documents) {
+        try {
+            client.add(documents);
+            client.commit();
+        } catch (final SolrServerException | IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

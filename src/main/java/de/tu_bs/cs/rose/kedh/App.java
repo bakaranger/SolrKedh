@@ -6,8 +6,12 @@ import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 public abstract class App {
@@ -20,6 +24,27 @@ public abstract class App {
         return doc;
     }
     
+    private static void submissionOne(final SolrConnector solr, final String dataDirectory) throws IOException {
+        final Collection<SolrInputDocument> documents = new ArrayList<>();
+        Files.list(Paths.get(dataDirectory)).filter(Files::isDirectory).forEach(dir -> {
+            final SolrInputDocument doc = new SolrInputDocument();
+            final String bookName = dir.getFileName().toString();
+            doc.addField("id", bookName);
+            try {
+                for (final File page : dir.toFile().listFiles()) {
+                    final String pageContent = new String(Files.readAllBytes(page.toPath()));
+                    final String pageName = page.getName().substring(0, page.getName().lastIndexOf('.'));
+                    doc.addField("page_" + pageName + "_txt_de", pageContent);
+//                    doc.addField("page_" + pageName + "_text_de", pageContent);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            documents.add(doc);
+        });
+        solr.index(documents);
+    }
+    
     public static void main(final String[] args) throws SolrServerException, IOException {
         BasicConfigurator.configure();
         
@@ -27,11 +52,9 @@ public abstract class App {
         
         final SolrConnector solr = new SolrConnector(url);
         
-        final Map<String, String> fields = new HashMap<>();
-        fields.put("id", "42");
-        fields.put("name", "Jewgeni Rose");
-        final SolrInputDocument doc = buildDocument(fields);
+        solr.getClient().deleteByQuery("*");
         
-        solr.index(doc);
+        submissionOne(solr, "/media/rose/Medien/Studium/Master/Information Discovery/wdk-partial-dump");
+        
     }
 }
