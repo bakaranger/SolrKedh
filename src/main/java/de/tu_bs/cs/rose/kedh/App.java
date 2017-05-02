@@ -34,8 +34,11 @@ public abstract class App {
                 for (final File page : dir.toFile().listFiles()) {
                     final String pageContent = new String(Files.readAllBytes(page.toPath()));
                     final String pageName = page.getName().substring(0, page.getName().lastIndexOf('.'));
+                    // store data as text: indexed, tokenized and stored
                     doc.addField("page_" + pageName + "_txt_de", pageContent);
-//                    doc.addField("page_" + pageName + "_text_de", pageContent);
+                    
+                    // buit-in text field _text_
+                    // doc.addField("_text_", pageContent);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -49,12 +52,14 @@ public abstract class App {
         BasicConfigurator.configure();
         
         final String url = "http://localhost:8983/solr/kedh";
+        final String dataDirectory = "/home/rose/Studium/Master/Information Discovery/wdk-partial-dump";
         
         final SolrConnector solr = new SolrConnector(url);
         
+        // delete everything from database
         solr.getClient().deleteByQuery("*");
         
-        submissionOne(solr, "/media/rose/Medien/Studium/Master/Information Discovery/wdk-partial-dump");
+        submissionOne(solr, dataDirectory);
         
     }
 }
