@@ -10,16 +10,16 @@ public class BookMetadata {
     private final String title;
     private final String creator;
     private final String publisher;
-    private final String date;
+    private final String year;
     private final String source;
     private final String rights;
     
-    public BookMetadata(final String id, final String title, final String creator, final String publisher, final String date, final String source, final String rights) {
+    public BookMetadata(final String id, final String title, final String creator, final String publisher, final String year, final String source, final String rights) {
         this.id = id;
         this.title = title;
         this.creator = creator;
         this.publisher = publisher;
-        this.date = date;
+        this.year = year;
         this.source = source;
         this.rights = rights;
     }
@@ -40,8 +40,8 @@ public class BookMetadata {
         return publisher;
     }
     
-    public String getDate() {
-        return date;
+    public String getYear() {
+        return year;
     }
     
     public String getSource() {
@@ -69,14 +69,15 @@ public class BookMetadata {
     
     @Override
     public String toString() {
-        return "BookMetadata{" +
-                "id='" + id + '\'' +
-                ", title='" + title + '\'' +
-                ", creator='" + creator + '\'' +
-                ", publisher='" + publisher + '\'' +
-                ", date='" + date + '\'' +
-                ", source='" + source + '\'' +
-                ", rights='" + rights + '\'' +
-                '}';
+        int indentLength = "Dublin Core Metadata".length();
+        final String[] fields = {"Title", "Author or Creator", "Publisher", "Date", "Source", "Rights Management"};
+        return String.format("Dublin Core Metadata: %s%n" +
+                        "%" + indentLength + "s: %s%n" + // title
+                        "%" + indentLength + "s: %s%n" + // creator
+                        "%" + indentLength + "s: %s%n" + // publisher
+                        "%" + indentLength + "s: %s%n" + // date
+                        "%" + indentLength + "s: %s%n" + // source
+                        "%" + indentLength + "s: %s%n",  // rights
+                id, fields[0], title, fields[1], creator, fields[2], publisher, fields[3], year, fields[4], source, fields[5], rights);
     }
 }

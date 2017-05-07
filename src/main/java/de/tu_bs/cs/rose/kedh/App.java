@@ -31,7 +31,7 @@ public abstract class App {
         return doc;
     }
     
-    private static void submissionOne(final SolrConnector solr, final String dataDirectory) throws IOException {
+    private static void fillDatabase(final SolrConnector solr, final String dataDirectory) throws IOException {
         final Collection<SolrInputDocument> documents = new ArrayList<>();
         Files.list(Paths.get(dataDirectory)).filter(Files::isDirectory).forEach(dir -> {
             final SolrInputDocument doc = new SolrInputDocument();
@@ -99,27 +99,51 @@ public abstract class App {
         return null;
     }
     
+    private static SolrDocumentList query(final SolrConnector solr, final String query, int maxResults) {
+        final SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("Europa");
+        solrQuery.setRows(maxResults);
+        QueryResponse response = null;
+        try {
+            response = solr.getClient().query(solrQuery);
+        } catch (final SolrServerException | IOException e) {
+            e.printStackTrace();
+        }
+        if (response != null) {
+            return response.getResults();
+        }
+        return new SolrDocumentList();
+    }
+    
+    private static SolrDocumentList query(final SolrConnector solr, final String query) {
+        return query(solr, query, 10);
+    }
+    
+    private static void print(final SolrDocumentList list) {
+        list.forEach(doc -> {
+            System.out.println(metadata(doc.getFieldValue("id").toString()));
+        });
+    }
+    
+    private static void resetDatabase(final SolrConnector solr) {
+        // delete everything from database
+        try {
+            solr.getClient().deleteByQuery("*");
+        } catch (final SolrServerException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     public static void main(final String[] args) throws SolrServerException, IOException {
         BasicConfigurator.configure();
         
         final String url = "http://localhost:8983/solr/kedh";
-        final String dataDirectory = "/media/rose/Medien/Studium/Master/Information Discovery/wdk-partial-dump";
-        
         final SolrConnector solr = new SolrConnector(url);
-        
-        // delete everything from database
-//        solr.getClient().deleteByQuery("*");
 
-//        submissionOne(solr, dataDirectory);
+        // final String dataDirectory = "/media/rose/Medien/Studium/Master/Information Discovery/wdk-partial-dump";
+        // fillDatabase(solr, dataDirectory);
         
-        final int maxResults = 20;
-        final SolrQuery query = new SolrQuery();
-        query.setQuery("Europa");
-        query.setRows(maxResults);
-        final QueryResponse response = solr.getClient().query(query);
-        final SolrDocumentList list = response.getResults();
-        list.forEach(doc -> {
-            System.out.println(metadata(doc.getFieldValue("id").toString()));
-        });
+        final SolrDocumentList results = query(solr, "Europa");
+        print(results);
     }
 }
