@@ -27,12 +27,13 @@ public abstract class App {
     private static final String DC = "dc:";
     private static final String STRING_TYPE = "_s";
     private static final String TEXT_TYPE = "_t";
-    private static final String TITLE = "title";
-    private static final String CREATOR = "creator";
-    private static final String PUBLISHER = "publisher";
-    private static final String DATE = "date";
-    private static final String SOURCE = "source";
-    private static final String RIGHTS = "rights";
+    private static final String ID = "id";
+    private static final String TITLE = "title" + STRING_TYPE;
+    private static final String CREATOR = "creator" + STRING_TYPE;
+    private static final String PUBLISHER = "publisher" + STRING_TYPE;
+    private static final String DATE = "date" + STRING_TYPE;
+    private static final String SOURCE = "source" + TEXT_TYPE;
+    private static final String RIGHTS = "rights" + STRING_TYPE;
     
     private static final int NO_LIMITS = -1;
     private static final boolean METADATA = true;
@@ -55,7 +56,7 @@ public abstract class App {
         Files.list(Paths.get(dataDirectory)).filter(Files::isDirectory).forEach(dir -> {
             final SolrInputDocument doc = new SolrInputDocument();
             final String documentID = dir.getFileName().toString();
-            doc.addField("id", documentID);
+            doc.addField(ID, documentID);
             try {
                 final StringBuilder bookContent = new StringBuilder();
                 for (final File page : dir.toFile().listFiles()) {
@@ -77,12 +78,12 @@ public abstract class App {
     private static void fillMetadata(final SolrInputDocument doc, final String documentID) {
         final BookMetadata metadata = metadata(documentID);
         if (metadata != null) {
-            doc.addField(TITLE + STRING_TYPE, metadata.getTitle());
-            doc.addField(CREATOR + STRING_TYPE, metadata.getCreator());
-            doc.addField(PUBLISHER + STRING_TYPE, metadata.getPublisher());
-            doc.addField(DATE + STRING_TYPE, metadata.getDate());
-            doc.addField(SOURCE + TEXT_TYPE, metadata.getSource());
-            doc.addField(RIGHTS + STRING_TYPE, metadata.getRights());
+            doc.addField(TITLE, metadata.getTitle());
+            doc.addField(CREATOR, metadata.getCreator());
+            doc.addField(PUBLISHER, metadata.getPublisher());
+            doc.addField(DATE, metadata.getDate());
+            doc.addField(SOURCE, metadata.getSource());
+            doc.addField(RIGHTS, metadata.getRights());
         }
     }
     
@@ -165,11 +166,26 @@ public abstract class App {
                 System.out.println(metadata(doc.getFieldValue("id").toString()));
             });
         } else {
+            int indentLength = "Dublin Core Metadata".length();
+            final String[] fields = {"Title", "Author or Creator", "Publisher", "Date", "Source", "Rights Management"};
+            
             list.forEach(doc -> {
-                final Collection<String> fieldNames = doc.getFieldNames();
-                fieldNames.forEach(field -> {
-                    System.out.println(field + ": " + doc.getFieldValue(field));
-                });
+                final String bookString = String.format("Dublin Core Metadata: %s%n" +
+                                "%" + indentLength + "s: %s%n" + // title
+                                "%" + indentLength + "s: %s%n" + // creator
+                                "%" + indentLength + "s: %s%n" + // publisher
+                                "%" + indentLength + "s: %s%n" + // date
+                                "%" + indentLength + "s: %s%n" + // source
+                                "%" + indentLength + "s: %s%n",  // rights
+                        doc.getFieldValue(ID),
+                        fields[0], doc.getFieldValue(TITLE),
+                        fields[1], doc.getFieldValue(CREATOR),
+                        fields[2], doc.getFieldValue(PUBLISHER),
+                        fields[3], doc.getFieldValue(DATE),
+                        fields[4], doc.getFieldValue(SOURCE),
+                        fields[5], doc.getFieldValue(RIGHTS));
+                
+                System.out.println(bookString);
                 System.out.println();
             });
         }
@@ -181,15 +197,15 @@ public abstract class App {
         
         final String url = "http://localhost:8983/solr/kedh";
         final SolrConnector solr = new SolrConnector(url);
-        
+
 //        resetDatabase(solr);
-        
+
 //        final String dataDirectory = "/home/rose/Studium/Master/Information Discovery/wdk-partial-dump";
 //        fillDatabase(solr, dataDirectory, METADATA);
-
-
+        
+        
         final SolrDocumentList results = query(solr, "Europa");
         print(results, !METADATA);
-    
+        
     }
 }
