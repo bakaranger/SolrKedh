@@ -10,16 +10,16 @@ public class BookMetadata {
     private final String title;
     private final String creator;
     private final String publisher;
-    private final String year;
+    private final String date;
     private final String source;
     private final String rights;
     
-    public BookMetadata(final String id, final String title, final String creator, final String publisher, final String year, final String source, final String rights) {
+    public BookMetadata(final String id, final String title, final String creator, final String publisher, final String date, final String source, final String rights) {
         this.id = id;
         this.title = title;
         this.creator = creator;
         this.publisher = publisher;
-        this.year = year;
+        this.date = date;
         this.source = source;
         this.rights = rights;
     }
@@ -40,8 +40,8 @@ public class BookMetadata {
         return publisher;
     }
     
-    public String getYear() {
-        return year;
+    public String getDate() {
+        return date;
     }
     
     public String getSource() {
@@ -78,6 +78,6 @@ public class BookMetadata {
                         "%" + indentLength + "s: %s%n" + // date
                         "%" + indentLength + "s: %s%n" + // source
                         "%" + indentLength + "s: %s%n",  // rights
-                id, fields[0], title, fields[1], creator, fields[2], publisher, fields[3], year, fields[4], source, fields[5], rights);
+                id, fields[0], title, fields[1], creator, fields[2], publisher, fields[3], date, fields[4], source, fields[5], rights);
     }
 }
